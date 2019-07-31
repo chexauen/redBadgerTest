@@ -53,6 +53,6 @@ public class RobotServiceTest {
     @Test
     public void testFileSuccessfully(){
         List<String> strings = robotsService.generateRobotOutputs("src/test/resources/test.txt");
-        Assertions.fail(); //TODO
+        Assertions.assertArrayEquals(strings.toArray(),Arrays.asList("1 1 E","3 3 N LOST","2 3 S").toArray());
     }
 }
