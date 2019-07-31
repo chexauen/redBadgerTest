@@ -5,9 +5,15 @@ import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class MarsSurface {
 
     public int maxX;

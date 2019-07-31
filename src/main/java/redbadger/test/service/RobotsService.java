@@ -18,7 +18,6 @@ import redbadger.test.model.Robot;
 
 public class RobotsService {
 
-
     public List<String> generateRobotOutputs(String fileName){
         File file = new File(fileName);
         BufferedReader br = null;
@@ -27,7 +26,8 @@ public class RobotsService {
             //we get the mars surface from the first line
             MarsSurface marsSurface = createMarsSurface(br.readLine());
             List<Pair<Robot, String>> robotsAndMovements = getRobotsAndMovements(br.lines().collect(Collectors.toList()));
-            return generateStringOutput(marsSurface, robotsAndMovements);
+            moveRobotsOverSurface(marsSurface,robotsAndMovements);
+            return generateStringOutput(robotsAndMovements.stream().map(Pair::getKey).collect(Collectors.toList()));
         } catch (FileNotFoundException e) {
             System.out.println("Specified file wasn't found: "+ file.getAbsolutePath());
         } catch (IOException e) {
@@ -44,7 +44,11 @@ public class RobotsService {
         return new ArrayList<>();
     }
 
-    public List<String> generateStringOutput(MarsSurface marsSurface, List<Pair<Robot, String>> robotsAndMovements) {
+    public void moveRobotsOverSurface(MarsSurface marsSurface, List<Pair<Robot,String>> robotsAndMovements) {
+        //TODO
+    }
+
+    public List<String> generateStringOutput(List<Robot> robots) {
         //TODO
         return new ArrayList<>();
     }
