@@ -18,6 +18,8 @@ import redbadger.test.model.Robot;
 
 public class RobotsService {
 
+    private Robot.RobotHeading[] orderedPositions = new Robot.RobotHeading[]{Robot.RobotHeading.N,Robot.RobotHeading.W,Robot.RobotHeading.S,Robot.RobotHeading.E};
+
     public List<String> generateRobotOutputs(String fileName){
         File file = new File(fileName);
         BufferedReader br = null;
@@ -45,12 +47,101 @@ public class RobotsService {
     }
 
     public void moveRobotsOverSurface(MarsSurface marsSurface, List<Pair<Robot,String>> robotsAndMovements) {
-        //TODO
+        for (Pair<Robot, String> robotMovementPair : robotsAndMovements) {
+            char[] movementsArray = robotMovementPair.getRight().toCharArray();
+            for (char c : movementsArray) {
+                performMovement(marsSurface, robotMovementPair.getLeft(), c);
+            }
+        }
+    }
+
+    private void performMovement(MarsSurface marsSurface, Robot robot, char c) {
+        if (robot.isLost()) {
+            return;
+        }
+        if (c == 'R'){
+            moveRobotToTheRight(robot);
+        } else if (c == 'L'){
+            moveRobotToTheLeft(robot);
+        } else if (c == 'F'){
+            Pair<Integer, Integer> nextPosition = positionAfterForwardMovement(robot);
+            if (isPositionOutsideBorders(marsSurface, nextPosition)){
+                if (marsSurface.getLostRobots().contains(Pair.of(robot.getCurrentX(),robot.getCurrentY()))){
+                    //ignore
+                } else {
+                    robot.setLost(true);
+                    marsSurface.getLostRobots().add(Pair.of(robot.getCurrentX(),robot.getCurrentY()));
+                }
+            } else {
+                robot.setCurrentX(nextPosition.getLeft());
+                robot.setCurrentY(nextPosition.getRight());
+            }
+        }
+    }
+
+    private boolean isPositionOutsideBorders(MarsSurface marsSurface, Pair<Integer, Integer> nextPosition) {
+        return nextPosition.getLeft() <0 || nextPosition.getRight() <0 || nextPosition.getLeft() > marsSurface.getMaxX() || nextPosition.getRight() > marsSurface.getMaxY();
+    }
+
+    private Pair<Integer, Integer> positionAfterForwardMovement(Robot robot) {
+        Pair<Integer, Integer> result = null;
+        switch (robot.getHeading()){
+            case N:
+                result = Pair.of(robot.getCurrentX(),robot.getCurrentY()+1);
+                break;
+            case S:
+                result = Pair.of(robot.getCurrentX(),robot.getCurrentY()-1);
+                break;
+            case W:
+                result = Pair.of(robot.getCurrentX()-1,robot.getCurrentY());
+                break;
+            case E:
+                result = Pair.of(robot.getCurrentX()+1,robot.getCurrentY());
+                break;
+        }
+        return result;
+    }
+
+    private void moveRobotToTheLeft(Robot robot) {
+        int currentHeadingValue = getCurrentHeadingValue(robot);
+        robot.setHeading(orderedPositions[(currentHeadingValue + 1)%4]);
+    }
+
+    private void moveRobotToTheRight(Robot robot) {
+        int currentHeadingValue = getCurrentHeadingValue(robot);
+        int i = currentHeadingValue - 1;
+        if (i<0){
+            i=3;
+        }
+        robot.setHeading(orderedPositions[i%4]);
+    }
+
+    private int getCurrentHeadingValue(Robot robot) {
+        switch (robot.getHeading()){
+            case N:
+                return 0;
+            case W:
+                return 1;
+            case S:
+                return 2;
+            case E:
+                return 3;
+        }
+        return 0;
     }
 
     public List<String> generateStringOutput(List<Robot> robots) {
-        //TODO
-        return new ArrayList<>();
+        List<String> result = new ArrayList<>();
+        for (Robot robot : robots) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(robot.getCurrentX()).append(" ").append(robot.getCurrentY())
+                    .append(" ").append(robot.getHeading().name());
+            if (robot.isLost()){
+                sb.append(" LOST");
+            }
+            result.add(sb.toString());
+        }
+        return result;
     }
 
     public List<Pair<Robot, String>> getRobotsAndMovements(List<String> robotStrings){

@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -73,7 +74,7 @@ public class RobotServiceTest {
 
     @Test
     public void moveRobotRight(){
-        MarsSurface marsSurface = MarsSurface.builder().maxX(1).maxY(1).build();
+        MarsSurface marsSurface = MarsSurface.builder().lostRobots(new HashSet<>()).maxX(1).maxY(1).build();
         Robot robot = Robot.builder().currentX(0).currentY(0).heading(Robot.RobotHeading.N).build();
         robotsService.moveRobotsOverSurface(marsSurface,Arrays.asList(Pair.of(robot,"R")));
         assertEquals(robot.getHeading(),Robot.RobotHeading.E);
@@ -87,7 +88,7 @@ public class RobotServiceTest {
 
     @Test
     public void moveRobotLeft(){
-        MarsSurface marsSurface = MarsSurface.builder().maxX(1).maxY(1).build();
+        MarsSurface marsSurface = MarsSurface.builder().lostRobots(new HashSet<>()).maxX(1).maxY(1).build();
         Robot robot = Robot.builder().currentX(0).currentY(0).heading(Robot.RobotHeading.N).build();
         robotsService.moveRobotsOverSurface(marsSurface,Arrays.asList(Pair.of(robot,"L")));
         assertEquals(robot.getHeading(),Robot.RobotHeading.W);
@@ -101,7 +102,7 @@ public class RobotServiceTest {
 
     @Test
     public void moveRobotEachDirection(){
-        MarsSurface marsSurface = MarsSurface.builder().maxX(2).maxY(2).build();
+        MarsSurface marsSurface = MarsSurface.builder().lostRobots(new HashSet<>()).maxX(2).maxY(2).build();
         Robot robot = Robot.builder().currentX(1).currentY(1).heading(Robot.RobotHeading.N).build();
         robotsService.moveRobotsOverSurface(marsSurface,Arrays.asList(Pair.of(robot,"F")));
         assertEquals(robot.getCurrentX(),1);
@@ -112,29 +113,29 @@ public class RobotServiceTest {
         assertEquals(robot.getCurrentY(),0);
         robot = Robot.builder().currentX(1).currentY(1).heading(Robot.RobotHeading.W).build();
         robotsService.moveRobotsOverSurface(marsSurface,Arrays.asList(Pair.of(robot,"F")));
-        assertEquals(robot.getCurrentX(),2);
+        assertEquals(robot.getCurrentX(),0);
         assertEquals(robot.getCurrentY(),1);
         robot = Robot.builder().currentX(1).currentY(1).heading(Robot.RobotHeading.E).build();
         robotsService.moveRobotsOverSurface(marsSurface,Arrays.asList(Pair.of(robot,"F")));
-        assertEquals(robot.getCurrentX(),0);
+        assertEquals(robot.getCurrentX(),2);
         assertEquals(robot.getCurrentY(),1);
     }
 
     @Test
     public void moveRobotWithinGrid(){
-        MarsSurface marsSurface = MarsSurface.builder().maxX(1).maxY(1).build();
+        MarsSurface marsSurface = MarsSurface.builder().lostRobots(new HashSet<>()).maxX(1).maxY(1).build();
         Robot robot = Robot.builder().currentX(0).currentY(0).heading(Robot.RobotHeading.N).build();
         robotsService.moveRobotsOverSurface(marsSurface,Arrays.asList(Pair.of(robot,"FRFRFRF")));
         assertEquals(robot.getCurrentX(),0);
         assertEquals(robot.getCurrentY(),0);
-        assertEquals(robot.getHeading(),Robot.RobotHeading.E);
+        assertEquals(robot.getHeading(),Robot.RobotHeading.W);
         assertFalse(robot.isLost());
         assertTrue(marsSurface.getLostRobots().isEmpty());
     }
 
     @Test
     public void moveRobotsOutOfGrid(){
-        MarsSurface marsSurface = MarsSurface.builder().maxX(1).maxY(1).build();
+        MarsSurface marsSurface = MarsSurface.builder().lostRobots(new HashSet<>()).maxX(1).maxY(1).build();
         Robot robot = Robot.builder().currentX(0).currentY(0).heading(Robot.RobotHeading.N).build();
         //First robot goes out
         robotsService.moveRobotsOverSurface(marsSurface,Arrays.asList(Pair.of(robot,"FFFFRF")));
